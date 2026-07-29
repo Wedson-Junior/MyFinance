@@ -1,0 +1,221 @@
+/* ==========================================
+   MyFinance - Dark Theme
+   ========================================== */
+
+* {
+    font-family: "Segoe UI";
+    font-size: 10pt;
+    color: #E8EAF0;
+}
+
+
+/* ==========================================
+   Janela
+   ========================================== */
+
+QMainWindow,
+QWidget#centralwidget {
+    background-color: #181C23;
+}
+
+
+/* ==========================================
+   Menu lateral
+   ========================================== */
+
+QFrame#frm_leftmenu {
+    background-color: #222730;
+    border-right: 1px solid #303845;
+}
+
+
+/* ==========================================
+   Área principal
+   ========================================== */
+
+QFrame#frm_mainmenu {
+    background-color: #181C23;
+}
+
+
+/* ==========================================
+   Botões do menu
+   ========================================== */
+
+QPushButton {
+    border: none;
+    border-left:solid transparent;
+    background-color: transparent;
+    color: white;
+    border-radius: 6px;
+    text-align: left;
+    padding-left: 15px;
+}
+
+QPushButton:hover {
+    font-size: 16px;
+}
+
+/* botão selecionado */
+
+QPushButton:checked {
+
+    border:1px solid #3578E5 ;
+    color: white;
+}
+
+
+/* ==========================================
+   StackedWidget
+   ========================================== */
+
+QStackedWidget {
+
+    background-color: #181C23;
+    border: none;
+}
+
+
+/* ==========================================
+   Frames internos (Cards)
+   ========================================== */
+
+QFrame {
+
+    background-color: #242A34;
+    border: 1px solid #323A46;
+    border-radius: 12px;
+}
+
+
+/* ==========================================
+   Labels
+   ========================================== */
+
+QLabel {
+
+    color: #E8EAF0;
+}
+
+
+/* Título */
+
+QLabel#lbl_title {
+
+    font-size: 20pt;
+    font-weight: bold;
+    color: white;
+}
+
+
+/* Subtítulos */
+
+QLabel#lbl_subtitle {
+
+    color: #A8AFBC;
+    font-size: 10pt;
+}
+
+
+/* ==========================================
+   Line Edit
+   ========================================== */
+
+QLineEdit {
+
+    background-color: #222730;
+    border: 1px solid #39414D;
+    border-radius: 8px;
+    padding: 8px;
+}
+
+
+QLineEdit:focus {
+
+    border: 1px solid #3A8DFF;
+}
+
+
+/* ==========================================
+   ComboBox
+   ========================================== */
+
+QComboBox {
+
+    background-color: #222730;
+    border: 1px solid #39414D;
+    border-radius: 8px;
+    padding: 8px;
+}
+
+
+/* ==========================================
+   SpinBox
+   ========================================== */
+
+QSpinBox,
+QDoubleSpinBox {
+
+    background-color: #222730;
+    border: 1px solid #39414D;
+    border-radius: 8px;
+    padding: 8px;
+}
+
+
+/* ==========================================
+   Table
+   ========================================== */
+
+QTableWidget {
+
+    background-color: #222730;
+    border: 1px solid #323A46;
+    border-radius: 10px;
+}
+
+
+QHeaderView::section {
+
+    background-color: #2B3440;
+    border: none;
+    padding: 8px;
+    font-weight: bold;
+}
+
+
+/* ==========================================
+   ScrollBar
+   ========================================== */
+
+QScrollBar:vertical {
+
+    width: 10px;
+    background: transparent;
+}
+
+
+QScrollBar::handle:vertical {
+
+    background: #4B5565;
+    border-radius: 5px;
+}
+
+
+QScrollBar::handle:vertical:hover {
+
+    background: #3578E5;
+}
+
+
+/* ==========================================
+   ToolTip
+   ========================================== */
+
+QToolTip {
+
+    background-color: #2B3440;
+    border: 1px solid #3578E5;
+    color: white;
+    padding: 5px;
+}

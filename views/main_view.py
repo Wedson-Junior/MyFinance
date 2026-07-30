@@ -6,6 +6,8 @@ from PySide6.QtWidgets import QWidget, QButtonGroup, QVBoxLayout
 from PySide6.QtUiTools import QUiLoader
 
 from config.settings import ICONS_DIR
+from views.accounts_view import AccountsView
+from views.categories_view import CategoriesView
 
 
 class MainView(QWidget):
@@ -14,9 +16,13 @@ class MainView(QWidget):
 
     def __init__(self) -> None:
         super().__init__()
+        self._accounts_view: AccountsView | None = None
+        self._categories_view: CategoriesView | None = None
         self._load_ui()
         self._setup_icons()
         self._setup_button_group()
+        self._setup_accounts_page()
+        self._setup_categories_page()
         self._connect_signals()
 
     def _load_ui(self) -> None:
@@ -37,7 +43,6 @@ class MainView(QWidget):
         self._ui.lbl_reports_title.setObjectName("lbl_title")
         self._ui.lbl_settings_title.setObjectName("lbl_title")
         self._ui.lbl_about_title.setObjectName("lbl_title")
-
         self._ui.lbl_dashboard_subtitle.setObjectName("lbl_subtitle")
 
     def _setup_icons(self) -> None:
@@ -70,6 +75,24 @@ class MainView(QWidget):
         ]
         for button in buttons:
             self._nav_group.addButton(button)
+
+    def _clear_page(self, page) -> None:
+        while page.layout() and page.layout().count():
+            item = page.layout().takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+    def _setup_accounts_page(self) -> None:
+        page = self._ui.page_accounts
+        self._clear_page(page)
+        self._accounts_view = AccountsView()
+        page.layout().addWidget(self._accounts_view)
+
+    def _setup_categories_page(self) -> None:
+        page = self._ui.page_categories
+        self._clear_page(page)
+        self._categories_view = CategoriesView()
+        page.layout().addWidget(self._categories_view)
 
     def _connect_signals(self) -> None:
         self._ui.btn_dashboard.clicked.connect(lambda: self._on_navigate("dashboard"))
@@ -109,3 +132,9 @@ class MainView(QWidget):
         button = button_map.get(page)
         if button:
             button.setChecked(True)
+
+    def get_accounts_view(self) -> AccountsView | None:
+        return self._accounts_view
+
+    def get_categories_view(self) -> CategoriesView | None:
+        return self._categories_view

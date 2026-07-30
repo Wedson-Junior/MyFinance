@@ -9,6 +9,8 @@ from config.settings import (
 )
 from database.database_manager import DatabaseManager
 from services.user_service import UserService
+from services.account_service import AccountService
+from services.category_service import CategoryService
 from views.login_view import LoginView
 from views.main_view import MainView
 from controllers.login_controller import LoginController
@@ -22,6 +24,8 @@ class App(QMainWindow):
         self._db = DatabaseManager()
         self._db.initialize()
         self._user_service = UserService(self._db)
+        self._account_service = AccountService(self._db)
+        self._category_service = CategoryService(self._db)
         self._current_user: User | None = None
 
         self._setup_window()
@@ -52,7 +56,12 @@ class App(QMainWindow):
 
     def _show_main(self) -> None:
         self._main_view = MainView()
-        self._main_controller = MainController(self._main_view)
+        self._main_controller = MainController(
+            self._main_view,
+            self._account_service,
+            self._category_service,
+            self._current_user,
+        )
         self._main_controller.logout_requested.connect(self._on_logout)
 
         self._stack.addWidget(self._main_view)

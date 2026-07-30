@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QStackedWidget
+from PySide6.QtWidgets import QMainWindow, QStackedWidget
 
 from config.settings import (
     WINDOW_TITLE,
@@ -10,7 +10,9 @@ from config.settings import (
 from database.database_manager import DatabaseManager
 from services.user_service import UserService
 from views.login_view import LoginView
+from views.main_view import MainView
 from controllers.login_controller import LoginController
+from controllers.main_controller import MainController
 from models.user import User
 
 
@@ -46,13 +48,27 @@ class App(QMainWindow):
     def _on_login_success(self, user: User) -> None:
         self._current_user = user
         self.setWindowTitle(f"{WINDOW_TITLE} - {user.username}")
-        # Placeholder até o Step 6 (Dashboard)
-        from PySide6.QtWidgets import QLabel
-        placeholder = QLabel(f"Bem-vindo, {user.username}!\n\nDashboard em breve (Step 6)")
-        placeholder.setStyleSheet("font-size: 18pt; color: white;")
-        placeholder.setAlignment(placeholder.alignment() | 0x84)
-        self._stack.addWidget(placeholder)
-        self._stack.setCurrentWidget(placeholder)
+        self._show_main()
+
+    def _show_main(self) -> None:
+        self._main_view = MainView()
+        self._main_controller = MainController(self._main_view)
+        self._main_controller.logout_requested.connect(self._on_logout)
+
+        self._stack.addWidget(self._main_view)
+        self._stack.setCurrentWidget(self._main_view)
+        self._main_view.show_page("dashboard")
+
+    def _on_logout(self) -> None:
+        self._current_user = None
+        self.setWindowTitle(WINDOW_TITLE)
+
+        while self._stack.count() > 0:
+            widget = self._stack.widget(0)
+            self._stack.removeWidget(widget)
+            widget.deleteLater()
+
+        self._show_login()
 
     def closeEvent(self, event) -> None:
         self._db.close()

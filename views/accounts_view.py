@@ -1,8 +1,14 @@
 from pathlib import Path
 from typing import List, Optional
 
-from PySide6.QtCore import Signal
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QTableWidgetItem, QHeaderView
+from PySide6.QtCore import Signal, Qt
+from PySide6.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
+    QTableWidgetItem,
+    QHeaderView,
+    QMessageBox,
+)
 from PySide6.QtUiTools import QUiLoader
 
 from models.bank_account import BankAccount
@@ -72,18 +78,17 @@ class AccountsView(QWidget):
 
         account_id = int(self._ui.tbl_accounts.item(row, 0).text())
         name = self._ui.tbl_accounts.item(row, 1).text()
-        balance_text = self._ui.tbl_accounts.item(row, 2).text().replace("R$", "").replace(",", "").strip()
+        balance = self._ui.tbl_accounts.item(row, 2).data(Qt.UserRole)
         currency = self._ui.tbl_accounts.item(row, 3).text()
 
         self._editing_id = account_id
         self._ui.txt_name.setText(name)
-        try:
-            self._ui.spn_balance.setValue(float(balance_text))
-        except ValueError:
-            self._ui.spn_balance.setValue(0.0)
+        self._ui.spn_balance.setValue(float(balance) if balance is not None else 0.0)
+
         index = self._ui.cmb_currency.findText(currency)
         if index >= 0:
             self._ui.cmb_currency.setCurrentIndex(index)
+
         self._ui.btn_save.setText("Atualizar")
         self.clear_error()
 
@@ -92,6 +97,18 @@ class AccountsView(QWidget):
         if row < 0:
             self.show_error("Selecione uma conta para excluir.")
             return
+
+        name = self._ui.tbl_accounts.item(row, 1).text()
+        reply = QMessageBox.question(
+            self,
+            "Confirmar exclusão",
+            f"Deseja excluir a conta \"{name}\"?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+        if reply != QMessageBox.Yes:
+            return
+
         account_id = int(self._ui.tbl_accounts.item(row, 0).text())
         self.delete_requested.emit(account_id)
 
@@ -100,11 +117,18 @@ class AccountsView(QWidget):
         for account in accounts:
             row = self._ui.tbl_accounts.rowCount()
             self._ui.tbl_accounts.insertRow(row)
+
             self._ui.tbl_accounts.setItem(row, 0, QTableWidgetItem(str(account.id)))
             self._ui.tbl_accounts.setItem(row, 1, QTableWidgetItem(account.name))
-            self._ui.tbl_accounts.setItem(row, 2, QTableWidgetItem(f"R$ {account.balance:,.2f}"))
+
+            balance_item = QTableWidgetItem(f"R$ {account.balance:,.2f}")
+            balance_item.setData(Qt.UserRole, account.balance)
+            self._ui.tbl_accounts.setItem(row, 2, balance_item)
+
             self._ui.tbl_accounts.setItem(row, 3, QTableWidgetItem(account.currency))
-            self._ui.tbl_accounts.setItem(row, 4, QTableWidgetItem("Sim" if account.is_active else "Não"))
+            self._ui.tbl_accounts.setItem(
+                row, 4, QTableWidgetItem("Sim" if account.is_active else "Não")
+            )
 
     def clear_form(self) -> None:
         self._editing_id = None

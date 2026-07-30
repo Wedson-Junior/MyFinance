@@ -61,6 +61,10 @@ class CategoriesController(QObject):
             self._view.show_error("Informe o nome da categoria.")
             return
 
+        if category_type not in ("income", "expense"):
+            self._view.show_error("Tipo inválido.")
+            return
+
         existing = self._category_service.get_by_id(category_id)
         if existing is None:
             self._view.show_error("Categoria não encontrada.")

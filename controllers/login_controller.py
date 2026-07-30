@@ -1,9 +1,7 @@
 import hashlib
-from typing import Optional
 
 from PySide6.QtCore import QObject, Signal
 
-from models.user import User
 from services.user_service import UserService
 from views.login_view import LoginView
 

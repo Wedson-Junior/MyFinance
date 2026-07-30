@@ -1,8 +1,5 @@
-from typing import Optional
-
 from PySide6.QtCore import QObject
 
-from models.bank_account import BankAccount
 from models.user import User
 from services.account_service import AccountService
 from views.accounts_view import AccountsView

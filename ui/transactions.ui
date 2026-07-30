@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TransactionsPage</class>
+ <widget class="QWidget" name="TransactionsPage">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>650</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <property name="spacing">
+    <number>16</number>
+   </property>
+   <property name="leftMargin">
+    <number>24</number>
+   </property>
+   <property name="topMargin">
+    <number>24</number>
+   </property>
+   <property name="rightMargin">
+    <number>24</number>
+   </property>
+   <property name="bottomMargin">
+    <number>24</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="lbl_title">
+     <property name="text">
+      <string>Movimentações</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="lbl_subtitle">
+     <property name="text">
+      <string>Lançamentos de receitas e despesas</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="formRow1">
+     <property name="spacing">
+      <number>12</number>
+     </property>
+     <item>
+      <widget class="QComboBox" name="cmb_account">
+       <property name="minimumSize">
+        <size>
+         <width>180</width>
+         <height>36</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cmb_type">
+       <property name="minimumSize">
+        <size>
+         <width>120</width>
+         <height>36</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cmb_category">
+       <property name="minimumSize">
+        <size>
+         <width>180</width>
+         <height>36</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="spn_amount">
+       <property name="prefix">
+        <string>R$ </string>
+       </property>
+       <property name="decimals">
+        <number>2</number>
+       </property>
+       <property name="maximum">
+        <double>999999999.990000000000000</double>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>140</width>
+         <height>36</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="formRow2">
+     <property name="spacing">
+      <number>12</number>
+     </property>
+     <item>
+      <widget class="QDateEdit" name="date_transaction">
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+       <property name="displayFormat">
+        <string>dd/MM/yyyy</string>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>140</width>
+         <height>36</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="txt_description">
+       <property name="placeholderText">
+        <string>Descrição</string>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>250</width>
+         <height>36</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chk_recurring">
+       <property name="text">
+        <string>Recorrente</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_save">
+       <property name="text">
+        <string>Salvar</string>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>36</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_clear">
+       <property name="text">
+        <string>Limpar</string>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>36</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="lbl_error">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: #E74C3C;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="tbl_transactions">
+     <property name="columnCount">
+      <number>8</number>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <column>
+      <property name="text">
+       <string>ID</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Data</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Tipo</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Conta</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Categoria</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Valor</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Descrição</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Recorrente</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="actionsLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_edit">
+       <property name="text">
+        <string>Editar</string>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>36</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_delete">
+       <property name="text">
+        <string>Excluir</string>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>36</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

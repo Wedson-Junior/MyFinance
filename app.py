@@ -11,6 +11,7 @@ from database.database_manager import DatabaseManager
 from services.user_service import UserService
 from services.account_service import AccountService
 from services.category_service import CategoryService
+from services.transaction_service import TransactionService
 from views.login_view import LoginView
 from views.main_view import MainView
 from controllers.login_controller import LoginController
@@ -26,6 +27,7 @@ class App(QMainWindow):
         self._user_service = UserService(self._db)
         self._account_service = AccountService(self._db)
         self._category_service = CategoryService(self._db)
+        self._transaction_service = TransactionService(self._db)
         self._current_user: User | None = None
 
         self._setup_window()
@@ -60,6 +62,7 @@ class App(QMainWindow):
             self._main_view,
             self._account_service,
             self._category_service,
+            self._transaction_service,
             self._current_user,
         )
         self._main_controller.logout_requested.connect(self._on_logout)

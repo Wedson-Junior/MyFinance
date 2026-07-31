@@ -11,6 +11,8 @@ from views.categories_view import CategoriesView
 from views.transactions_view import TransactionsView
 from views.dashboard_view import DashboardView
 from views.reports_view import ReportsView
+from views.settings_view import SettingsView
+from views.about_view import AboutView
 
 
 class MainView(QWidget):
@@ -24,6 +26,8 @@ class MainView(QWidget):
         self._transactions_view: TransactionsView | None = None
         self._dashboard_view: DashboardView | None = None
         self._reports_view: ReportsView | None = None
+        self._settings_view: SettingsView | None = None
+        self._about_view: AboutView | None = None
         self._load_ui()
         self._setup_icons()
         self._setup_button_group()
@@ -32,6 +36,8 @@ class MainView(QWidget):
         self._setup_categories_page()
         self._setup_transactions_page()
         self._setup_reports_page()
+        self._setup_settings_page()
+        self._setup_about_page()
         self._connect_signals()
 
     def _load_ui(self) -> None:
@@ -121,6 +127,18 @@ class MainView(QWidget):
         self._reports_view = ReportsView()
         page.layout().addWidget(self._reports_view)
 
+    def _setup_settings_page(self) -> None:
+        page = self._ui.page_settings
+        self._clear_page(page)
+        self._settings_view = SettingsView()
+        page.layout().addWidget(self._settings_view)
+
+    def _setup_about_page(self) -> None:
+        page = self._ui.page_about
+        self._clear_page(page)
+        self._about_view = AboutView()
+        page.layout().addWidget(self._about_view)
+
     def _connect_signals(self) -> None:
         self._ui.btn_dashboard.clicked.connect(lambda: self._on_navigate("dashboard"))
         self._ui.btn_accounts.clicked.connect(lambda: self._on_navigate("accounts"))
@@ -174,3 +192,9 @@ class MainView(QWidget):
 
     def get_reports_view(self) -> ReportsView | None:
         return self._reports_view
+
+    def get_settings_view(self) -> SettingsView | None:
+        return self._settings_view
+
+    def get_about_view(self) -> AboutView | None:
+        return self._about_view

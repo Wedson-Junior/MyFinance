@@ -88,6 +88,10 @@ class MainController(QObject):
                 self._current_user,
             )
 
+        settings_view = self._view.get_settings_view()
+        if settings_view is not None:
+            settings_view.set_username(self._current_user.username)
+
     def _handle_navigate(self, page: str) -> None:
         self._view.show_page(page)
         if page == "dashboard" and self._dashboard_controller is not None:

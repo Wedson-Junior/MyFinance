@@ -7,113 +7,223 @@
     <x>0</x>
     <y>0</y>
     <width>420</width>
-    <height>380</height>
+    <height>480</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>MyFinance - Login</string>
-  </property>
-  <layout class="QVBoxLayout" name="mainLayout">
+  <layout class="QVBoxLayout" name="outerLayout">
    <property name="spacing">
-    <number>16</number>
+    <number>0</number>
    </property>
    <property name="leftMargin">
-    <number>40</number>
+    <number>0</number>
    </property>
    <property name="topMargin">
-    <number>40</number>
+    <number>0</number>
    </property>
    <property name="rightMargin">
-    <number>40</number>
+    <number>0</number>
    </property>
    <property name="bottomMargin">
-    <number>40</number>
+    <number>0</number>
    </property>
    <item>
-    <widget class="QLabel" name="lbl_title">
-     <property name="text">
-      <string>MyFinance</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="lbl_subtitle">
-     <property name="text">
-      <string>Controle financeiro pessoal</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
+    <spacer name="topSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>20</height>
+       <height>40</height>
       </size>
      </property>
     </spacer>
    </item>
    <item>
-    <widget class="QLineEdit" name="txt_username">
-     <property name="placeholderText">
-      <string>Usuário</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="centerLayout">
+     <item>
+      <spacer name="leftSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QFrame" name="card">
+       <property name="minimumSize">
+        <size>
+         <width>320</width>
+         <height>360</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>360</width>
+         <height>420</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <layout class="QVBoxLayout" name="cardLayout">
+        <property name="spacing">
+         <number>12</number>
+        </property>
+        <property name="leftMargin">
+         <number>28</number>
+        </property>
+        <property name="topMargin">
+         <number>28</number>
+        </property>
+        <property name="rightMargin">
+         <number>28</number>
+        </property>
+        <property name="bottomMargin">
+         <number>28</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="lbl_title">
+          <property name="text">
+           <string>MyFinance</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font-size: 20pt; font-weight: bold;</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lbl_subtitle">
+          <property name="text">
+           <string>Controle financeiro pessoal</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="formTopSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>12</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="txt_username">
+          <property name="placeholderText">
+           <string>Usuário</string>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="txt_password">
+          <property name="placeholderText">
+           <string>Senha</string>
+          </property>
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lbl_error">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: #E74C3C;</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_login">
+          <property name="text">
+           <string>Entrar</string>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_register">
+          <property name="text">
+           <string>Criar conta</string>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <spacer name="rightSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
    <item>
-    <widget class="QLineEdit" name="txt_password">
-     <property name="placeholderText">
-      <string>Senha</string>
+    <spacer name="bottomSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
-     <property name="echoMode">
-      <enum>QLineEdit::Password</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="lbl_error">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color: #E74C3C;</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="btn_login">
-     <property name="text">
-      <string>Entrar</string>
-     </property>
-     <property name="minimumSize">
+     <property name="sizeHint" stdset="0">
       <size>
-       <width>0</width>
+       <width>20</width>
        <height>40</height>
       </size>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="btn_register">
-     <property name="text">
-      <string>Criar conta</string>
-     </property>
-     <property name="flat">
-      <bool>true</bool>
-     </property>
-    </widget>
+    </spacer>
    </item>
   </layout>
  </widget>

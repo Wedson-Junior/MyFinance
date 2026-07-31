@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QMainWindow, QStackedWidget
+from PySide6.QtWidgets import QMainWindow, QStackedWidget, QApplication
 
 from config.settings import (
     WINDOW_TITLE,
@@ -6,6 +6,9 @@ from config.settings import (
     MIN_HEIGHT,
     DEFAULT_WIDTH,
     DEFAULT_HEIGHT,
+    apply_theme,
+    set_current_theme,
+    get_current_theme,
 )
 from database.database_manager import DatabaseManager
 from services.user_service import UserService
@@ -66,10 +69,17 @@ class App(QMainWindow):
             self._current_user,
         )
         self._main_controller.logout_requested.connect(self._on_logout)
+        self._main_controller.theme_change_requested.connect(self._on_theme_change)
 
         self._stack.addWidget(self._main_view)
         self._stack.setCurrentWidget(self._main_view)
         self._main_view.show_page("dashboard")
+
+    def _on_theme_change(self, theme: str) -> None:
+        set_current_theme(theme)
+        application = QApplication.instance()
+        if application is not None:
+            apply_theme(application, theme)
 
     def _on_logout(self) -> None:
         self._current_user = None

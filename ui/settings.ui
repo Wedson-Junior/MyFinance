@@ -113,9 +113,12 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="lbl_theme_value">
-        <property name="text">
-         <string>Dark (padrão)</string>
+       <widget class="QComboBox" name="cmb_theme">
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>36</height>
+         </size>
         </property>
        </widget>
       </item>

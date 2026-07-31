@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 from PySide6.QtWidgets import QApplication
@@ -18,11 +19,69 @@ MIN_HEIGHT = 600
 DEFAULT_WIDTH = 1280
 DEFAULT_HEIGHT = 720
 
-THEME_FILE = STYLES_DIR / "dark.qss"
+THEME_DARK = "dark"
+THEME_LIGHT = "light"
+THEME_FILES = {
+    THEME_DARK: STYLES_DIR / "dark.qss",
+    THEME_LIGHT: STYLES_DIR / "light.qss",
+}
+PREFERENCES_FILE = DATA_DIR / "preferences.json"
 DATABASE_PATH = DATA_DIR / "myfinance.db"
 
 
-def load_theme(app: QApplication) -> None:
-    if THEME_FILE.exists():
-        with open(THEME_FILE, "r", encoding="utf-8") as file:
+def _ensure_data_dir() -> None:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def load_preferences() -> dict:
+    _ensure_data_dir()
+    if not PREFERENCES_FILE.exists():
+        return {"theme": THEME_DARK}
+    try:
+        with open(PREFERENCES_FILE, "r", encoding="utf-8") as file:
+            data = json.load(file)
+            if not isinstance(data, dict):
+                return {"theme": THEME_DARK}
+            return data
+    except (json.JSONDecodeError, OSError):
+        return {"theme": THEME_DARK}
+
+
+def save_preferences(preferences: dict) -> None:
+    _ensure_data_dir()
+    with open(PREFERENCES_FILE, "w", encoding="utf-8") as file:
+        json.dump(preferences, file, indent=2)
+
+
+def get_current_theme() -> str:
+    preferences = load_preferences()
+    theme = preferences.get("theme", THEME_DARK)
+    if theme not in THEME_FILES:
+        return THEME_DARK
+    return theme
+
+
+def set_current_theme(theme: str) -> None:
+    if theme not in THEME_FILES:
+        theme = THEME_DARK
+    preferences = load_preferences()
+    preferences["theme"] = theme
+    save_preferences(preferences)
+
+
+def apply_theme(app: QApplication, theme: str | None = None) -> None:
+    if theme is None:
+        theme = get_current_theme()
+    if theme not in THEME_FILES:
+        theme = THEME_DARK
+
+    theme_file = THEME_FILES[theme]
+    if theme_file.exists():
+        with open(theme_file, "r", encoding="utf-8") as file:
             app.setStyleSheet(file.read())
+    else:
+        app.setStyleSheet("")
+
+
+def load_theme(app: QApplication) -> None:
+    apply_theme(app)

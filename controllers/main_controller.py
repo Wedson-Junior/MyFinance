@@ -10,10 +10,12 @@ from controllers.transactions_controller import TransactionsController
 from controllers.dashboard_controller import DashboardController
 from controllers.reports_controller import ReportsController
 from views.main_view import MainView
+from config.settings import get_current_theme
 
 
 class MainController(QObject):
     logout_requested = Signal()
+    theme_change_requested = Signal(str)
 
     def __init__(
         self,
@@ -40,6 +42,10 @@ class MainController(QObject):
     def _connect_signals(self) -> None:
         self._view.navigate.connect(self._handle_navigate)
         self._view.logout_requested.connect(self.logout_requested.emit)
+
+        settings_view = self._view.get_settings_view()
+        if settings_view is not None:
+            settings_view.theme_changed.connect(self.theme_change_requested.emit)
 
     def _setup_modules(self) -> None:
         dashboard_view = self._view.get_dashboard_view()
@@ -91,6 +97,7 @@ class MainController(QObject):
         settings_view = self._view.get_settings_view()
         if settings_view is not None:
             settings_view.set_username(self._current_user.username)
+            settings_view.set_theme(get_current_theme())
 
     def _handle_navigate(self, page: str) -> None:
         self._view.show_page(page)

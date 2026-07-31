@@ -8,6 +8,7 @@ from controllers.accounts_controller import AccountsController
 from controllers.categories_controller import CategoriesController
 from controllers.transactions_controller import TransactionsController
 from controllers.dashboard_controller import DashboardController
+from controllers.reports_controller import ReportsController
 from views.main_view import MainView
 
 
@@ -32,6 +33,7 @@ class MainController(QObject):
         self._categories_controller: CategoriesController | None = None
         self._transactions_controller: TransactionsController | None = None
         self._dashboard_controller: DashboardController | None = None
+        self._reports_controller: ReportsController | None = None
         self._connect_signals()
         self._setup_modules()
 
@@ -76,6 +78,16 @@ class MainController(QObject):
                 self._current_user,
             )
 
+        reports_view = self._view.get_reports_view()
+        if reports_view is not None:
+            self._reports_controller = ReportsController(
+                reports_view,
+                self._account_service,
+                self._category_service,
+                self._transaction_service,
+                self._current_user,
+            )
+
     def _handle_navigate(self, page: str) -> None:
         self._view.show_page(page)
         if page == "dashboard" and self._dashboard_controller is not None:
@@ -86,3 +98,5 @@ class MainController(QObject):
             self._categories_controller.refresh()
         elif page == "transactions" and self._transactions_controller is not None:
             self._transactions_controller.refresh()
+        elif page == "reports" and self._reports_controller is not None:
+            self._reports_controller.refresh()

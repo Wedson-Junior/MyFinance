@@ -10,6 +10,7 @@ from views.accounts_view import AccountsView
 from views.categories_view import CategoriesView
 from views.transactions_view import TransactionsView
 from views.dashboard_view import DashboardView
+from views.reports_view import ReportsView
 
 
 class MainView(QWidget):
@@ -22,6 +23,7 @@ class MainView(QWidget):
         self._categories_view: CategoriesView | None = None
         self._transactions_view: TransactionsView | None = None
         self._dashboard_view: DashboardView | None = None
+        self._reports_view: ReportsView | None = None
         self._load_ui()
         self._setup_icons()
         self._setup_button_group()
@@ -29,6 +31,7 @@ class MainView(QWidget):
         self._setup_accounts_page()
         self._setup_categories_page()
         self._setup_transactions_page()
+        self._setup_reports_page()
         self._connect_signals()
 
     def _load_ui(self) -> None:
@@ -112,6 +115,12 @@ class MainView(QWidget):
         self._transactions_view = TransactionsView()
         page.layout().addWidget(self._transactions_view)
 
+    def _setup_reports_page(self) -> None:
+        page = self._ui.page_reports
+        self._clear_page(page)
+        self._reports_view = ReportsView()
+        page.layout().addWidget(self._reports_view)
+
     def _connect_signals(self) -> None:
         self._ui.btn_dashboard.clicked.connect(lambda: self._on_navigate("dashboard"))
         self._ui.btn_accounts.clicked.connect(lambda: self._on_navigate("accounts"))
@@ -162,3 +171,6 @@ class MainView(QWidget):
 
     def get_dashboard_view(self) -> DashboardView | None:
         return self._dashboard_view
+
+    def get_reports_view(self) -> ReportsView | None:
+        return self._reports_view

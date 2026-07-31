@@ -7,6 +7,7 @@ from services.transaction_service import TransactionService
 from controllers.accounts_controller import AccountsController
 from controllers.categories_controller import CategoriesController
 from controllers.transactions_controller import TransactionsController
+from controllers.dashboard_controller import DashboardController
 from views.main_view import MainView
 
 
@@ -30,6 +31,7 @@ class MainController(QObject):
         self._accounts_controller: AccountsController | None = None
         self._categories_controller: CategoriesController | None = None
         self._transactions_controller: TransactionsController | None = None
+        self._dashboard_controller: DashboardController | None = None
         self._connect_signals()
         self._setup_modules()
 
@@ -38,6 +40,16 @@ class MainController(QObject):
         self._view.logout_requested.connect(self.logout_requested.emit)
 
     def _setup_modules(self) -> None:
+        dashboard_view = self._view.get_dashboard_view()
+        if dashboard_view is not None:
+            self._dashboard_controller = DashboardController(
+                dashboard_view,
+                self._account_service,
+                self._category_service,
+                self._transaction_service,
+                self._current_user,
+            )
+
         accounts_view = self._view.get_accounts_view()
         if accounts_view is not None:
             self._accounts_controller = AccountsController(
@@ -66,7 +78,9 @@ class MainController(QObject):
 
     def _handle_navigate(self, page: str) -> None:
         self._view.show_page(page)
-        if page == "accounts" and self._accounts_controller is not None:
+        if page == "dashboard" and self._dashboard_controller is not None:
+            self._dashboard_controller.refresh()
+        elif page == "accounts" and self._accounts_controller is not None:
             self._accounts_controller.refresh()
         elif page == "categories" and self._categories_controller is not None:
             self._categories_controller.refresh()

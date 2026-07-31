@@ -9,6 +9,7 @@ from config.settings import ICONS_DIR
 from views.accounts_view import AccountsView
 from views.categories_view import CategoriesView
 from views.transactions_view import TransactionsView
+from views.dashboard_view import DashboardView
 
 
 class MainView(QWidget):
@@ -20,9 +21,11 @@ class MainView(QWidget):
         self._accounts_view: AccountsView | None = None
         self._categories_view: CategoriesView | None = None
         self._transactions_view: TransactionsView | None = None
+        self._dashboard_view: DashboardView | None = None
         self._load_ui()
         self._setup_icons()
         self._setup_button_group()
+        self._setup_dashboard_page()
         self._setup_accounts_page()
         self._setup_categories_page()
         self._setup_transactions_page()
@@ -84,6 +87,12 @@ class MainView(QWidget):
             item = page.layout().takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
+
+    def _setup_dashboard_page(self) -> None:
+        page = self._ui.page_dashboard
+        self._clear_page(page)
+        self._dashboard_view = DashboardView()
+        page.layout().addWidget(self._dashboard_view)
 
     def _setup_accounts_page(self) -> None:
         page = self._ui.page_accounts
@@ -150,3 +159,6 @@ class MainView(QWidget):
 
     def get_transactions_view(self) -> TransactionsView | None:
         return self._transactions_view
+
+    def get_dashboard_view(self) -> DashboardView | None:
+        return self._dashboard_view

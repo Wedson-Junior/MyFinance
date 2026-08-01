@@ -1,5 +1,3 @@
-# CLAUDE.md
-
 # Projeto PySide6
 
 Sempre siga esta sequência antes de escrever qualquer código.

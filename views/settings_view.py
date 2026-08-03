@@ -4,17 +4,24 @@ from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QWidget, QVBoxLayout
 from PySide6.QtUiTools import QUiLoader
 
-from config.settings import THEME_DARK, THEME_LIGHT
+from config.settings import (
+    THEME_DARK,
+    THEME_LIGHT,
+    CHART_TYPES,
+)
 
 
 class SettingsView(QWidget):
     theme_changed = Signal(str)
+    chart_type_changed = Signal(str)
 
     def __init__(self) -> None:
         super().__init__()
         self._updating_theme = False
+        self._updating_chart = False
         self._load_ui()
         self._setup_theme_combo()
+        self._setup_chart_combo()
         self._connect_signals()
 
     def _load_ui(self) -> None:
@@ -36,8 +43,14 @@ class SettingsView(QWidget):
         self._ui.cmb_theme.addItem("Escuro", THEME_DARK)
         self._ui.cmb_theme.addItem("Claro", THEME_LIGHT)
 
+    def _setup_chart_combo(self) -> None:
+        self._ui.cmb_chart_type.clear()
+        for key, label in CHART_TYPES.items():
+            self._ui.cmb_chart_type.addItem(label, key)
+
     def _connect_signals(self) -> None:
         self._ui.cmb_theme.currentIndexChanged.connect(self._on_theme_changed)
+        self._ui.cmb_chart_type.currentIndexChanged.connect(self._on_chart_type_changed)
 
     def _on_theme_changed(self) -> None:
         if self._updating_theme:
@@ -45,6 +58,13 @@ class SettingsView(QWidget):
         theme = self._ui.cmb_theme.currentData()
         if theme:
             self.theme_changed.emit(theme)
+
+    def _on_chart_type_changed(self) -> None:
+        if self._updating_chart:
+            return
+        chart_type = self._ui.cmb_chart_type.currentData()
+        if chart_type:
+            self.chart_type_changed.emit(chart_type)
 
     def set_username(self, username: str) -> None:
         self._ui.lbl_username.setText(username)
@@ -55,3 +75,10 @@ class SettingsView(QWidget):
         if index >= 0:
             self._ui.cmb_theme.setCurrentIndex(index)
         self._updating_theme = False
+
+    def set_chart_type(self, chart_type: str) -> None:
+        self._updating_chart = True
+        index = self._ui.cmb_chart_type.findData(chart_type)
+        if index >= 0:
+            self._ui.cmb_chart_type.setCurrentIndex(index)
+        self._updating_chart = False

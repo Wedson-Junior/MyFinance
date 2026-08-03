@@ -25,6 +25,18 @@ THEME_FILES = {
     THEME_DARK: STYLES_DIR / "dark.qss",
     THEME_LIGHT: STYLES_DIR / "light.qss",
 }
+
+CHART_BAR = "bar"
+CHART_LINE = "line"
+CHART_AREA = "area"
+CHART_PIE = "pie"
+CHART_TYPES = {
+    CHART_BAR: "Colunas",
+    CHART_LINE: "Linhas",
+    CHART_AREA: "Área",
+    CHART_PIE: "Pizza",
+}
+
 PREFERENCES_FILE = DATA_DIR / "preferences.json"
 DATABASE_PATH = DATA_DIR / "myfinance.db"
 
@@ -33,18 +45,27 @@ def _ensure_data_dir() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 
+def _default_preferences() -> dict:
+    return {
+        "theme": THEME_DARK,
+        "chart_type": CHART_BAR,
+    }
+
+
 def load_preferences() -> dict:
     _ensure_data_dir()
+    defaults = _default_preferences()
     if not PREFERENCES_FILE.exists():
-        return {"theme": THEME_DARK}
+        return defaults
     try:
         with open(PREFERENCES_FILE, "r", encoding="utf-8") as file:
             data = json.load(file)
             if not isinstance(data, dict):
-                return {"theme": THEME_DARK}
-            return data
+                return defaults
+            defaults.update(data)
+            return defaults
     except (json.JSONDecodeError, OSError):
-        return {"theme": THEME_DARK}
+        return defaults
 
 
 def save_preferences(preferences: dict) -> None:
@@ -66,6 +87,22 @@ def set_current_theme(theme: str) -> None:
         theme = THEME_DARK
     preferences = load_preferences()
     preferences["theme"] = theme
+    save_preferences(preferences)
+
+
+def get_chart_type() -> str:
+    preferences = load_preferences()
+    chart_type = preferences.get("chart_type", CHART_BAR)
+    if chart_type not in CHART_TYPES:
+        return CHART_BAR
+    return chart_type
+
+
+def set_chart_type(chart_type: str) -> None:
+    if chart_type not in CHART_TYPES:
+        chart_type = CHART_BAR
+    preferences = load_preferences()
+    preferences["chart_type"] = chart_type
     save_preferences(preferences)
 
 

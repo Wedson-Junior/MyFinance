@@ -10,7 +10,7 @@ from controllers.transactions_controller import TransactionsController
 from controllers.dashboard_controller import DashboardController
 from controllers.reports_controller import ReportsController
 from views.main_view import MainView
-from config.settings import get_current_theme
+from config.settings import get_current_theme, get_chart_type, set_chart_type
 
 
 class MainController(QObject):
@@ -45,7 +45,8 @@ class MainController(QObject):
 
         settings_view = self._view.get_settings_view()
         if settings_view is not None:
-            settings_view.theme_changed.connect(self.theme_change_requested.emit)
+            settings_view.theme_changed.connect(self._handle_theme_changed)
+            settings_view.chart_type_changed.connect(self._handle_chart_type_changed)
 
     def _setup_modules(self) -> None:
         dashboard_view = self._view.get_dashboard_view()
@@ -100,6 +101,17 @@ class MainController(QObject):
         if settings_view is not None:
             settings_view.set_username(self._current_user.username)
             settings_view.set_theme(get_current_theme())
+            settings_view.set_chart_type(get_chart_type())
+            
+    def _handle_theme_changed(self, theme: str) -> None:
+        self.theme_change_requested.emit(theme)
+        if self._dashboard_controller is not None:
+            self._dashboard_controller.refresh()
+
+    def _handle_chart_type_changed(self, chart_type: str) -> None:
+        set_chart_type(chart_type)
+        if self._dashboard_controller is not None:
+            self._dashboard_controller.refresh()
 
     def _handle_navigate(self, page: str) -> None:
         self._view.show_page(page)

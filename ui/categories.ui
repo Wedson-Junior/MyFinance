@@ -79,13 +79,10 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="txt_color">
-       <property name="placeholderText">
-        <string>Cor (ex: #3578E5)</string>
-       </property>
+      <widget class="QComboBox" name="cmb_color">
        <property name="minimumSize">
         <size>
-         <width>140</width>
+         <width>160</width>
          <height>36</height>
         </size>
        </property>

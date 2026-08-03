@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from PySide6.QtCore import Signal, Qt
+from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -12,6 +13,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtUiTools import QUiLoader
 
 from models.category import Category
+from utils.color_utils import PRESET_COLORS, color_icon, normalize_hex
 
 
 class CategoriesView(QWidget):
@@ -25,6 +27,7 @@ class CategoriesView(QWidget):
         self._editing_id: Optional[int] = None
         self._load_ui()
         self._setup_type_combo()
+        self._setup_color_combo()
         self._setup_table()
         self._connect_signals()
 
@@ -47,6 +50,12 @@ class CategoriesView(QWidget):
         self._ui.cmb_type.addItem("Receita", "income")
         self._ui.cmb_type.addItem("Despesa", "expense")
 
+    def _setup_color_combo(self) -> None:
+        self._ui.cmb_color.clear()
+        for name, hex_color in PRESET_COLORS:
+            self._ui.cmb_color.addItem(color_icon(hex_color), name, hex_color)
+        self._ui.cmb_color.setIconSize(self._ui.cmb_color.iconSize())
+
     def _setup_table(self) -> None:
         header = self._ui.tbl_categories.horizontalHeader()
         header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
@@ -55,6 +64,7 @@ class CategoriesView(QWidget):
         header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
         header.setSectionResizeMode(4, QHeaderView.ResizeToContents)
         self._ui.tbl_categories.setColumnHidden(0, True)
+        self._ui.tbl_categories.setIconSize(self._ui.tbl_categories.iconSize())
 
     def _connect_signals(self) -> None:
         self._ui.btn_save.clicked.connect(self._on_save)
@@ -62,10 +72,14 @@ class CategoriesView(QWidget):
         self._ui.btn_edit.clicked.connect(self._on_edit)
         self._ui.btn_delete.clicked.connect(self._on_delete)
 
+    def _selected_color(self) -> str:
+        color = self._ui.cmb_color.currentData()
+        return color if color else PRESET_COLORS[0][1]
+
     def _on_save(self) -> None:
         name = self._ui.txt_name.text().strip()
         category_type = self._ui.cmb_type.currentData()
-        color = self._ui.txt_color.text().strip() or ""
+        color = self._selected_color()
 
         if self._editing_id is not None:
             self.update_requested.emit(self._editing_id, name, category_type, color)
@@ -85,7 +99,7 @@ class CategoriesView(QWidget):
         category_id = int(self._ui.tbl_categories.item(row, 0).text())
         name = self._ui.tbl_categories.item(row, 1).text()
         category_type = self._ui.tbl_categories.item(row, 2).data(Qt.UserRole)
-        color = self._ui.tbl_categories.item(row, 3).text()
+        color = self._ui.tbl_categories.item(row, 3).data(Qt.UserRole) or ""
 
         self._editing_id = category_id
         self._ui.txt_name.setText(name)
@@ -94,7 +108,14 @@ class CategoriesView(QWidget):
         if index >= 0:
             self._ui.cmb_type.setCurrentIndex(index)
 
-        self._ui.txt_color.setText(color)
+        color_index = self._ui.cmb_color.findData(normalize_hex(color))
+        if color_index < 0:
+            color_index = self._ui.cmb_color.findData(color)
+        if color_index >= 0:
+            self._ui.cmb_color.setCurrentIndex(color_index)
+        else:
+            self._ui.cmb_color.setCurrentIndex(0)
+
         self._ui.btn_save.setText("Atualizar")
         self.clear_error()
 
@@ -132,7 +153,12 @@ class CategoriesView(QWidget):
             type_item.setData(Qt.UserRole, category.type)
             self._ui.tbl_categories.setItem(row, 2, type_item)
 
-            self._ui.tbl_categories.setItem(row, 3, QTableWidgetItem(category.color or ""))
+            hex_color = normalize_hex(category.color)
+            color_item = QTableWidgetItem(color_icon(hex_color), "")
+            color_item.setData(Qt.UserRole, hex_color)
+            color_item.setTextAlignment(Qt.AlignCenter)
+            self._ui.tbl_categories.setItem(row, 3, color_item)
+
             self._ui.tbl_categories.setItem(
                 row, 4, QTableWidgetItem("Sim" if category.is_active else "Não")
             )
@@ -141,7 +167,7 @@ class CategoriesView(QWidget):
         self._editing_id = None
         self._ui.txt_name.clear()
         self._ui.cmb_type.setCurrentIndex(0)
-        self._ui.txt_color.clear()
+        self._ui.cmb_color.setCurrentIndex(0)
         self._ui.btn_save.setText("Salvar")
         self.clear_error()
 

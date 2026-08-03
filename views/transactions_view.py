@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import List, Optional, Dict
 
 from PySide6.QtCore import Signal, Qt, QDate
+from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -14,6 +15,7 @@ from PySide6.QtUiTools import QUiLoader
 from models.transaction import Transaction
 from models.bank_account import BankAccount
 from models.category import Category
+from utils.color_utils import color_icon, normalize_hex, type_color
 
 
 class TransactionsView(QWidget):
@@ -28,6 +30,7 @@ class TransactionsView(QWidget):
         self._editing_id: Optional[int] = None
         self._accounts_map: Dict[int, str] = {}
         self._categories_map: Dict[int, str] = {}
+        self._categories_color_map: Dict[int, str] = {}
         self._load_ui()
         self._setup_combos()
         self._setup_table()
@@ -182,12 +185,16 @@ class TransactionsView(QWidget):
 
     def set_category_names(self, categories: List[Category]) -> None:
         self._categories_map = {c.id: c.name for c in categories if c.id is not None}
+        self._categories_color_map = {
+            c.id: normalize_hex(c.color) for c in categories if c.id is not None
+        }
 
     def set_categories(self, categories: List[Category]) -> None:
         current = self._ui.cmb_category.currentData()
         self._ui.cmb_category.clear()
         for category in categories:
-            self._ui.cmb_category.addItem(category.name, category.id)
+            hex_color = normalize_hex(category.color)
+            self._ui.cmb_category.addItem(color_icon(hex_color), category.name, category.id)
         if current is not None:
             index = self._ui.cmb_category.findData(current)
             if index >= 0:
@@ -208,6 +215,7 @@ class TransactionsView(QWidget):
             type_label = "Receita" if transaction.type == "income" else "Despesa"
             type_item = QTableWidgetItem(type_label)
             type_item.setData(Qt.UserRole, transaction.type)
+            type_item.setForeground(type_color(transaction.type))
             self._ui.tbl_transactions.setItem(row, 2, type_item)
 
             account_name = self._accounts_map.get(transaction.account_id, str(transaction.account_id))
@@ -215,13 +223,17 @@ class TransactionsView(QWidget):
             account_item.setData(Qt.UserRole, transaction.account_id)
             self._ui.tbl_transactions.setItem(row, 3, account_item)
 
-            category_name = self._categories_map.get(transaction.category_id, str(transaction.category_id))
-            category_item = QTableWidgetItem(category_name)
+            category_name = self._categories_map.get(
+                transaction.category_id, str(transaction.category_id)
+            )
+            category_color = self._categories_color_map.get(transaction.category_id)
+            category_item = QTableWidgetItem(color_icon(category_color), category_name)
             category_item.setData(Qt.UserRole, transaction.category_id)
             self._ui.tbl_transactions.setItem(row, 4, category_item)
 
             amount_item = QTableWidgetItem(f"R$ {transaction.amount:,.2f}")
             amount_item.setData(Qt.UserRole, transaction.amount)
+            amount_item.setForeground(type_color(transaction.type))
             self._ui.tbl_transactions.setItem(row, 5, amount_item)
 
             self._ui.tbl_transactions.setItem(

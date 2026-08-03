@@ -3,16 +3,23 @@ import hashlib
 from PySide6.QtCore import QObject, Signal
 
 from services.user_service import UserService
+from services.seed_service import SeedService
 from views.login_view import LoginView
 
 
 class LoginController(QObject):
     login_success = Signal(object)
 
-    def __init__(self, view: LoginView, user_service: UserService) -> None:
+    def __init__(
+        self,
+        view: LoginView,
+        user_service: UserService,
+        seed_service: SeedService,
+    ) -> None:
         super().__init__()
         self._view = view
         self._user_service = user_service
+        self._seed_service = seed_service
         self._connect_signals()
 
     def _connect_signals(self) -> None:
@@ -36,6 +43,7 @@ class LoginController(QObject):
             self._view.show_error("Usuário ou senha inválidos.")
             return
 
+        self._seed_service.seed_if_empty(user.id)
         self.login_success.emit(user)
 
     def _handle_register(self, username: str, password: str) -> None:
@@ -61,4 +69,5 @@ class LoginController(QObject):
             self._view.show_error("Erro ao criar conta.")
             return
 
+        self._seed_service.seed_user_defaults(user.id)
         self.login_success.emit(user)

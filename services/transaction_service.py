@@ -111,6 +111,17 @@ class TransactionService:
         self._db.execute("DELETE FROM transactions WHERE id = ?", (transaction_id,))
         return True
 
+    def delete_by_account(self, account_id: int) -> int:
+        rows = self._db.fetch_all(
+            "SELECT id FROM transactions WHERE account_id = ?",
+            (account_id,),
+        )
+        self._db.execute(
+            "DELETE FROM transactions WHERE account_id = ?",
+            (account_id,),
+        )
+        return len(rows)
+
     def _row_to_transaction(self, row) -> Transaction:
         return Transaction(
             id=row["id"],

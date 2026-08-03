@@ -108,6 +108,7 @@ class AccountsController(QObject):
 
     def _handle_delete(self, account_id: int) -> None:
         self._view.clear_error()
+        self._transaction_service.delete_by_account(account_id)
         self._account_service.delete(account_id)
         self._view.clear_form()
         self.refresh()

@@ -122,7 +122,8 @@ class AccountsView(QWidget):
         reply = QMessageBox.question(
             self,
             "Confirmar exclusão",
-            f"Deseja excluir a conta \"{name}\"?",
+            f"Deseja excluir a conta \"{name}\"?\n\n"
+            "Todas as movimentações desta conta também serão excluídas.",
             QMessageBox.Yes | QMessageBox.No,
             QMessageBox.No,
         )

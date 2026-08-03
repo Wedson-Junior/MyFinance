@@ -1,7 +1,7 @@
 from PySide6.QtCore import QObject
 
 from models.user import User
-from services.category_service import CategoryService
+from services.category_service import CategoryService, SYSTEM_CATEGORY_NAMES
 from views.categories_view import CategoriesView
 
 
@@ -26,7 +26,9 @@ class CategoriesController(QObject):
         self._view.clear_requested.connect(self._view.clear_form)
 
     def refresh(self) -> None:
-        categories = self._category_service.get_by_user(self._current_user.id)
+        categories = self._category_service.get_by_user(
+            self._current_user.id, include_system=False
+        )
         self._view.load_categories(categories)
 
     def _handle_save(self, name: str, category_type: str, color: str) -> None:
@@ -38,6 +40,10 @@ class CategoriesController(QObject):
 
         if category_type not in ("income", "expense"):
             self._view.show_error("Tipo inválido.")
+            return
+
+        if name in SYSTEM_CATEGORY_NAMES:
+            self._view.show_error("Este nome é reservado para o sistema.")
             return
 
         category = self._category_service.create(
@@ -70,6 +76,14 @@ class CategoriesController(QObject):
             self._view.show_error("Categoria não encontrada.")
             return
 
+        if self._category_service.is_system_category(existing):
+            self._view.show_error("Categoria de sistema não pode ser editada.")
+            return
+
+        if name in SYSTEM_CATEGORY_NAMES:
+            self._view.show_error("Este nome é reservado para o sistema.")
+            return
+
         existing.name = name
         existing.type = category_type
         existing.color = color if color else None
@@ -80,6 +94,10 @@ class CategoriesController(QObject):
 
     def _handle_delete(self, category_id: int) -> None:
         self._view.clear_error()
+        existing = self._category_service.get_by_id(category_id)
+        if existing is not None and self._category_service.is_system_category(existing):
+            self._view.show_error("Categoria de sistema não pode ser excluída.")
+            return
         self._category_service.delete(category_id)
         self._view.clear_form()
         self.refresh()

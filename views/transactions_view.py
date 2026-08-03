@@ -180,8 +180,10 @@ class TransactionsView(QWidget):
             if index >= 0:
                 self._ui.cmb_account.setCurrentIndex(index)
 
-    def set_categories(self, categories: List[Category]) -> None:
+    def set_category_names(self, categories: List[Category]) -> None:
         self._categories_map = {c.id: c.name for c in categories if c.id is not None}
+
+    def set_categories(self, categories: List[Category]) -> None:
         current = self._ui.cmb_category.currentData()
         self._ui.cmb_category.clear()
         for category in categories:

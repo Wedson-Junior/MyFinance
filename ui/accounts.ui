@@ -60,6 +60,9 @@
      </item>
      <item>
       <widget class="QDoubleSpinBox" name="spn_balance">
+       <property name="toolTip">
+        <string>Valor inicial (cria movimentação de receita)</string>
+       </property>
        <property name="prefix">
         <string>R$ </string>
        </property>

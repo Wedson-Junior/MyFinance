@@ -37,24 +37,22 @@ class TransactionsController(QObject):
         accounts = self._account_service.get_by_user(self._current_user.id)
         self._view.set_accounts(accounts)
 
-        transaction_type = "income"
-        categories = self._category_service.get_by_user(self._current_user.id, type=transaction_type)
-        self._view.set_categories(categories)
-
-        all_categories = self._category_service.get_by_user(self._current_user.id)
-        self._view.set_categories(all_categories)
+        all_categories = self._category_service.get_by_user(
+            self._current_user.id, include_system=True
+        )
+        self._view.set_category_names(all_categories)
 
         transactions = self._transaction_service.get_by_user(self._current_user.id)
         self._view.load_transactions(transactions)
 
         categories_for_type = self._category_service.get_by_user(
-            self._current_user.id, type="income"
+            self._current_user.id, type="income", include_system=False
         )
         self._view.set_categories(categories_for_type)
 
     def _handle_type_changed(self, category_type: str) -> None:
         categories = self._category_service.get_by_user(
-            self._current_user.id, type=category_type
+            self._current_user.id, type=category_type, include_system=False
         )
         self._view.set_categories(categories)
 

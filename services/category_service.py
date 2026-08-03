@@ -3,6 +3,8 @@ from typing import Optional, List
 from database.database_manager import DatabaseManager
 from models.category import Category
 
+SYSTEM_CATEGORY_NAMES = frozenset({"Saldo inicial"})
+
 
 class CategoryService:
     def __init__(self, db: DatabaseManager) -> None:
@@ -36,7 +38,12 @@ class CategoryService:
         )
         return self._row_to_category(row) if row else None
 
-    def get_by_user(self, user_id: int, type: Optional[str] = None) -> List[Category]:
+    def get_by_user(
+        self,
+        user_id: int,
+        type: Optional[str] = None,
+        include_system: bool = False,
+    ) -> List[Category]:
         if type:
             rows = self._db.fetch_all(
                 "SELECT * FROM categories WHERE user_id = ? AND type = ? AND is_active = 1 ORDER BY name",
@@ -47,9 +54,36 @@ class CategoryService:
                 "SELECT * FROM categories WHERE user_id = ? AND is_active = 1 ORDER BY name",
                 (user_id,),
             )
-        return [self._row_to_category(row) for row in rows]
+        categories = [self._row_to_category(row) for row in rows]
+        if not include_system:
+            categories = [c for c in categories if c.name not in SYSTEM_CATEGORY_NAMES]
+        return categories
+
+    def get_or_create(
+        self,
+        user_id: int,
+        name: str,
+        type: str,
+        color: Optional[str] = None,
+    ) -> Optional[Category]:
+        row = self._db.fetch_one(
+            """
+            SELECT * FROM categories
+            WHERE user_id = ? AND name = ? AND type = ? AND is_active = 1
+            LIMIT 1
+            """,
+            (user_id, name, type),
+        )
+        if row:
+            return self._row_to_category(row)
+        return self.create(user_id=user_id, name=name, type=type, color=color)
+
+    def is_system_category(self, category: Category) -> bool:
+        return category.name in SYSTEM_CATEGORY_NAMES
 
     def update(self, category: Category) -> bool:
+        if category.name in SYSTEM_CATEGORY_NAMES:
+            return False
         self._db.execute(
             """
             UPDATE categories
@@ -61,6 +95,9 @@ class CategoryService:
         return True
 
     def delete(self, category_id: int) -> bool:
+        existing = self.get_by_id(category_id)
+        if existing is not None and existing.name in SYSTEM_CATEGORY_NAMES:
+            return False
         self._db.execute(
             "UPDATE categories SET is_active = 0, updated_at = datetime('now') WHERE id = ?",
             (category_id,),

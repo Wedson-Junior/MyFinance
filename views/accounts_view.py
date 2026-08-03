@@ -16,7 +16,7 @@ from models.bank_account import BankAccount
 
 class AccountsView(QWidget):
     save_requested = Signal(str, float, str)
-    update_requested = Signal(int, str, float, str)
+    update_requested = Signal(int, str, str)
     delete_requested = Signal(int)
     clear_requested = Signal()
 
@@ -25,6 +25,7 @@ class AccountsView(QWidget):
         self._editing_id: Optional[int] = None
         self._load_ui()
         self._setup_table()
+        self._setup_form()
         self._connect_signals()
 
     def _load_ui(self) -> None:
@@ -50,6 +51,24 @@ class AccountsView(QWidget):
         header.setSectionResizeMode(4, QHeaderView.ResizeToContents)
         self._ui.tbl_accounts.setColumnHidden(0, True)
 
+    def _setup_form(self) -> None:
+        self._ui.spn_balance.setToolTip(
+            "Valor inicial: gera uma movimentação de receita \"Saldo inicial\""
+        )
+        self._set_create_mode()
+
+    def _set_create_mode(self) -> None:
+        self._ui.spn_balance.setEnabled(True)
+        self._ui.spn_balance.setToolTip(
+            "Valor inicial: gera uma movimentação de receita \"Saldo inicial\""
+        )
+
+    def _set_edit_mode(self) -> None:
+        self._ui.spn_balance.setEnabled(False)
+        self._ui.spn_balance.setToolTip(
+            "O saldo não pode ser editado. Use movimentações para alterar o valor."
+        )
+
     def _connect_signals(self) -> None:
         self._ui.btn_save.clicked.connect(self._on_save)
         self._ui.btn_clear.clicked.connect(self._on_clear)
@@ -58,13 +77,13 @@ class AccountsView(QWidget):
 
     def _on_save(self) -> None:
         name = self._ui.txt_name.text().strip()
-        balance = self._ui.spn_balance.value()
         currency = self._ui.cmb_currency.currentText()
 
         if self._editing_id is not None:
-            self.update_requested.emit(self._editing_id, name, balance, currency)
+            self.update_requested.emit(self._editing_id, name, currency)
         else:
-            self.save_requested.emit(name, balance, currency)
+            initial_amount = self._ui.spn_balance.value()
+            self.save_requested.emit(name, initial_amount, currency)
 
     def _on_clear(self) -> None:
         self.clear_form()
@@ -84,6 +103,7 @@ class AccountsView(QWidget):
         self._editing_id = account_id
         self._ui.txt_name.setText(name)
         self._ui.spn_balance.setValue(float(balance) if balance is not None else 0.0)
+        self._set_edit_mode()
 
         index = self._ui.cmb_currency.findText(currency)
         if index >= 0:
@@ -136,6 +156,7 @@ class AccountsView(QWidget):
         self._ui.spn_balance.setValue(0.0)
         self._ui.cmb_currency.setCurrentIndex(0)
         self._ui.btn_save.setText("Salvar")
+        self._set_create_mode()
         self.clear_error()
 
     def show_error(self, message: str) -> None:

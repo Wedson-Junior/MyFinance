@@ -52,7 +52,9 @@ class DashboardController(QObject):
             accounts_count=accounts_count,
         )
 
-        categories = self._category_service.get_by_user(self._current_user.id)
+        categories = self._category_service.get_by_user(
+            self._current_user.id, include_system=True
+        )
         categories_map = {
             category.id: category.name
             for category in categories

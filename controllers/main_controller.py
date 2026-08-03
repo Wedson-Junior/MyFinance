@@ -63,6 +63,8 @@ class MainController(QObject):
             self._accounts_controller = AccountsController(
                 accounts_view,
                 self._account_service,
+                self._category_service,
+                self._transaction_service,
                 self._current_user,
             )
 

@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from PySide6.QtCore import Signal
-from PySide6.QtWidgets import QWidget, QVBoxLayout
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QMessageBox
 from PySide6.QtUiTools import QUiLoader
 
 from config.settings import (
@@ -14,6 +14,7 @@ from config.settings import (
 class SettingsView(QWidget):
     theme_changed = Signal(str)
     chart_type_changed = Signal(str)
+    recalculate_requested = Signal()
 
     def __init__(self) -> None:
         super().__init__()
@@ -51,6 +52,7 @@ class SettingsView(QWidget):
     def _connect_signals(self) -> None:
         self._ui.cmb_theme.currentIndexChanged.connect(self._on_theme_changed)
         self._ui.cmb_chart_type.currentIndexChanged.connect(self._on_chart_type_changed)
+        self._ui.btn_recalculate.clicked.connect(self._on_recalculate)
 
     def _on_theme_changed(self) -> None:
         if self._updating_theme:
@@ -65,6 +67,19 @@ class SettingsView(QWidget):
         chart_type = self._ui.cmb_chart_type.currentData()
         if chart_type:
             self.chart_type_changed.emit(chart_type)
+
+    def _on_recalculate(self) -> None:
+        reply = QMessageBox.question(
+            self,
+            "Recalcular saldos",
+            "Recalcular todos os saldos das contas e das notas a prazo?\n\n"
+            "Esta operação é segura e pode ser executada quantas vezes for necessário.",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+        if reply == QMessageBox.Yes:
+            self._ui.lbl_recalculate_status.setText("Recalculando...")
+            self.recalculate_requested.emit()
 
     def set_username(self, username: str) -> None:
         self._ui.lbl_username.setText(username)
@@ -82,3 +97,11 @@ class SettingsView(QWidget):
         if index >= 0:
             self._ui.cmb_chart_type.setCurrentIndex(index)
         self._updating_chart = False
+
+    def show_recalculate_success(self) -> None:
+        self._ui.lbl_recalculate_status.setText("Saldos recalculados com sucesso.")
+        QMessageBox.information(
+            self,
+            "Recálculo concluído",
+            "Saldos das contas e notas a prazo foram recalculados.",
+        )

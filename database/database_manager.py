@@ -94,6 +94,48 @@ class DatabaseManager:
             """
         )
 
+
+        self.execute(
+            """
+            CREATE TABLE IF NOT EXISTS plan_items (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                month TEXT NOT NULL,
+                destination TEXT NOT NULL,
+                amount REAL NOT NULL,
+                notes TEXT,
+                created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+            """
+        )
+
+        self.execute(
+            """
+            CREATE TABLE IF NOT EXISTS payables_receivables (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                type TEXT NOT NULL CHECK(type IN ('payable', 'receivable')),
+                description TEXT NOT NULL,
+                original_amount REAL NOT NULL,
+                paid_amount REAL NOT NULL DEFAULT 0,
+                remaining_amount REAL NOT NULL,
+                due_date TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'pending'
+                    CHECK(status IN ('pending', 'partial', 'settled', 'overdue', 'cancelled')),
+                account_id INTEGER,
+                category_id INTEGER,
+                notes TEXT,
+                created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                FOREIGN KEY (account_id) REFERENCES bank_accounts(id) ON DELETE SET NULL,
+                FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
+            )
+            """
+        )
+
         self.execute(
             """
             CREATE TABLE IF NOT EXISTS transactions (
@@ -106,11 +148,23 @@ class DatabaseManager:
                 description TEXT,
                 date TEXT NOT NULL,
                 is_recurring INTEGER NOT NULL DEFAULT 0,
+                payable_receivable_id INTEGER,
                 created_at TEXT NOT NULL DEFAULT (datetime('now')),
                 updated_at TEXT NOT NULL DEFAULT (datetime('now')),
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
                 FOREIGN KEY (account_id) REFERENCES bank_accounts(id) ON DELETE CASCADE,
-                FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE RESTRICT
+                FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE RESTRICT,
+                FOREIGN KEY (payable_receivable_id) REFERENCES payables_receivables(id) ON DELETE SET NULL
             )
             """
         )
+
+        self._migrate_schema()
+
+    def _migrate_schema(self) -> None:
+        columns = self.fetch_all("PRAGMA table_info(transactions)")
+        column_names = {row["name"] for row in columns}
+        if "payable_receivable_id" not in column_names:
+            self.execute(
+                "ALTER TABLE transactions ADD COLUMN payable_receivable_id INTEGER"
+            )

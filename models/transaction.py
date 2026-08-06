@@ -13,5 +13,6 @@ class Transaction:
     description: Optional[str] = None
     date: str = ""
     is_recurring: bool = False
+    payable_receivable_id: Optional[int] = None
     created_at: Optional[str] = None
     updated_at: Optional[str] = None

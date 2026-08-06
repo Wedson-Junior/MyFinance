@@ -13,6 +13,7 @@ from views.dashboard_view import DashboardView
 from views.reports_view import ReportsView
 from views.settings_view import SettingsView
 from views.about_view import AboutView
+from views.payable_receivable_view import PayableReceivableView
 
 
 class MainView(QWidget):
@@ -28,6 +29,7 @@ class MainView(QWidget):
         self._reports_view: ReportsView | None = None
         self._settings_view: SettingsView | None = None
         self._about_view: AboutView | None = None
+        self._payables_view: PayableReceivableView | None = None
         self._load_ui()
         self._setup_icons()
         self._setup_button_group()
@@ -35,6 +37,7 @@ class MainView(QWidget):
         self._setup_accounts_page()
         self._setup_categories_page()
         self._setup_transactions_page()
+        self._setup_payables_page()
         self._setup_reports_page()
         self._setup_settings_page()
         self._setup_about_page()
@@ -58,6 +61,7 @@ class MainView(QWidget):
         self._ui.lbl_reports_title.setObjectName("lbl_title")
         self._ui.lbl_settings_title.setObjectName("lbl_title")
         self._ui.lbl_about_title.setObjectName("lbl_title")
+        self._ui.lbl_payables_title.setObjectName("lbl_title")
         self._ui.lbl_dashboard_subtitle.setObjectName("lbl_subtitle")
 
     def _setup_icons(self) -> None:
@@ -65,6 +69,7 @@ class MainView(QWidget):
             self._ui.btn_dashboard: "dashbord.ico",
             self._ui.btn_accounts: "banco.ico",
             self._ui.btn_transactions: "movimentacoes.ico",
+            self._ui.btn_payables: "movimentacoes.ico",
             self._ui.btn_categories: "banco.ico",
             self._ui.btn_reports: "relatorios.ico",
             self._ui.btn_settings: "configuracoes.ico",
@@ -83,11 +88,14 @@ class MainView(QWidget):
             self._ui.btn_dashboard,
             self._ui.btn_accounts,
             self._ui.btn_transactions,
+            self._ui.btn_payables,
             self._ui.btn_categories,
             self._ui.btn_reports,
             self._ui.btn_settings,
             self._ui.btn_about,
         ]
+        if hasattr(self._ui, "btn_planning"):
+            buttons.insert(-2, self._ui.btn_planning)
         for button in buttons:
             self._nav_group.addButton(button)
 
@@ -121,6 +129,12 @@ class MainView(QWidget):
         self._transactions_view = TransactionsView()
         page.layout().addWidget(self._transactions_view)
 
+    def _setup_payables_page(self) -> None:
+        page = self._ui.page_payables
+        self._clear_page(page)
+        self._payables_view = PayableReceivableView()
+        page.layout().addWidget(self._payables_view)
+
     def _setup_reports_page(self) -> None:
         page = self._ui.page_reports
         self._clear_page(page)
@@ -143,10 +157,13 @@ class MainView(QWidget):
         self._ui.btn_dashboard.clicked.connect(lambda: self._on_navigate("dashboard"))
         self._ui.btn_accounts.clicked.connect(lambda: self._on_navigate("accounts"))
         self._ui.btn_transactions.clicked.connect(lambda: self._on_navigate("transactions"))
+        self._ui.btn_payables.clicked.connect(lambda: self._on_navigate("payables"))
         self._ui.btn_categories.clicked.connect(lambda: self._on_navigate("categories"))
         self._ui.btn_reports.clicked.connect(lambda: self._on_navigate("reports"))
         self._ui.btn_settings.clicked.connect(lambda: self._on_navigate("settings"))
         self._ui.btn_about.clicked.connect(lambda: self._on_navigate("about"))
+        if hasattr(self._ui, "btn_planning"):
+            self._ui.btn_planning.clicked.connect(lambda: self._on_navigate("planning"))
         self._ui.btn_logout.clicked.connect(self.logout_requested.emit)
 
     def _on_navigate(self, page: str) -> None:
@@ -157,10 +174,12 @@ class MainView(QWidget):
             "dashboard": 0,
             "accounts": 1,
             "transactions": 2,
-            "categories": 3,
-            "reports": 4,
-            "settings": 5,
-            "about": 6,
+            "payables": 3,
+            "categories": 4,
+            "reports": 5,
+            "planning": 6,
+            "settings": 7,
+            "about": 8,
         }
         index = page_map.get(page, 0)
         self._ui.stack_content.setCurrentIndex(index)
@@ -169,11 +188,14 @@ class MainView(QWidget):
             "dashboard": self._ui.btn_dashboard,
             "accounts": self._ui.btn_accounts,
             "transactions": self._ui.btn_transactions,
+            "payables": self._ui.btn_payables,
             "categories": self._ui.btn_categories,
             "reports": self._ui.btn_reports,
             "settings": self._ui.btn_settings,
             "about": self._ui.btn_about,
         }
+        if hasattr(self._ui, "btn_planning"):
+            button_map["planning"] = self._ui.btn_planning
         button = button_map.get(page)
         if button:
             button.setChecked(True)
@@ -198,3 +220,6 @@ class MainView(QWidget):
 
     def get_about_view(self) -> AboutView | None:
         return self._about_view
+
+    def get_payables_view(self) -> PayableReceivableView | None:
+        return self._payables_view

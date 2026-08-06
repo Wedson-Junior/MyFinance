@@ -4,11 +4,13 @@ from models.user import User
 from services.account_service import AccountService
 from services.category_service import CategoryService
 from services.transaction_service import TransactionService
+from services.payable_receivable_service import PayableReceivableService
 from controllers.accounts_controller import AccountsController
 from controllers.categories_controller import CategoriesController
 from controllers.transactions_controller import TransactionsController
 from controllers.dashboard_controller import DashboardController
 from controllers.reports_controller import ReportsController
+from controllers.payable_receivable_controller import PayableReceivableController
 from views.main_view import MainView
 from config.settings import get_current_theme, get_chart_type, set_chart_type
 
@@ -23,6 +25,7 @@ class MainController(QObject):
         account_service: AccountService,
         category_service: CategoryService,
         transaction_service: TransactionService,
+        payable_service: PayableReceivableService,
         current_user: User,
     ) -> None:
         super().__init__()
@@ -30,12 +33,14 @@ class MainController(QObject):
         self._account_service = account_service
         self._category_service = category_service
         self._transaction_service = transaction_service
+        self._payable_service = payable_service
         self._current_user = current_user
         self._accounts_controller: AccountsController | None = None
         self._categories_controller: CategoriesController | None = None
         self._transactions_controller: TransactionsController | None = None
         self._dashboard_controller: DashboardController | None = None
         self._reports_controller: ReportsController | None = None
+        self._payables_controller: PayableReceivableController | None = None
         self._connect_signals()
         self._setup_modules()
 
@@ -47,6 +52,7 @@ class MainController(QObject):
         if settings_view is not None:
             settings_view.theme_changed.connect(self._handle_theme_changed)
             settings_view.chart_type_changed.connect(self._handle_chart_type_changed)
+            settings_view.recalculate_requested.connect(self._handle_recalculate)
 
     def _setup_modules(self) -> None:
         dashboard_view = self._view.get_dashboard_view()
@@ -97,12 +103,22 @@ class MainController(QObject):
                 self._current_user,
             )
 
+        payables_view = self._view.get_payables_view()
+        if payables_view is not None:
+            self._payables_controller = PayableReceivableController(
+                payables_view,
+                self._payable_service,
+                self._account_service,
+                self._category_service,
+                self._current_user,
+            )
+
         settings_view = self._view.get_settings_view()
         if settings_view is not None:
             settings_view.set_username(self._current_user.username)
             settings_view.set_theme(get_current_theme())
             settings_view.set_chart_type(get_chart_type())
-            
+
     def _handle_theme_changed(self, theme: str) -> None:
         self.theme_change_requested.emit(theme)
         if self._dashboard_controller is not None:
@@ -110,6 +126,19 @@ class MainController(QObject):
 
     def _handle_chart_type_changed(self, chart_type: str) -> None:
         set_chart_type(chart_type)
+        if self._dashboard_controller is not None:
+            self._dashboard_controller.refresh()
+
+    def _handle_recalculate(self) -> None:
+        self._transaction_service.recalculate_account_balances(self._current_user.id)
+        self._payable_service.recalculate_all(self._current_user.id)
+        settings_view = self._view.get_settings_view()
+        if settings_view is not None:
+            settings_view.show_recalculate_success()
+        if self._accounts_controller is not None:
+            self._accounts_controller.refresh()
+        if self._payables_controller is not None:
+            self._payables_controller.refresh()
         if self._dashboard_controller is not None:
             self._dashboard_controller.refresh()
 
